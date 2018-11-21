@@ -23,7 +23,7 @@ func (d Deal) Digest() string {
 
 type Store interface {
 	Add(*Deal) error
-	FilterExisting([]Deal) ([]Deal, error)
+	FilterNew([]Deal) ([]Deal, error)
 }
 
 func (d Deal) String() string {

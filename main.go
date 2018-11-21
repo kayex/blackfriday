@@ -38,7 +38,7 @@ func main() {
 	}
 }
 
-func findNewDeals(s Store) ([]Deal, error) {
+func findAndStoreDeals(s Store) ([]Deal, error) {
 	page, err := fetchDeals()
 	if err != nil {
 		return nil, fmt.Errorf("error fetching deals page: %v", err)
@@ -49,7 +49,7 @@ func findNewDeals(s Store) ([]Deal, error) {
 		return nil, fmt.Errorf("error fetching deals from page: %v", err)
 	}
 
-	newDeals, err := s.FilterExisting(parsed)
+	newDeals, err := s.FilterNew(parsed)
 	if err != nil {
 		return nil, fmt.Errorf("error verifying new deals: %v", err)
 	}
@@ -60,12 +60,11 @@ func findNewDeals(s Store) ([]Deal, error) {
 			return nil, fmt.Errorf("error saving new deal: %v", err)
 		}
 	}
-
 	return newDeals, nil
 }
 
 func run(store Store, send func(string) error) error {
-	newDeals, err := findNewDeals(store)
+	newDeals, err := findAndStoreDeals(store)
 	if err != nil {
 		return err
 	}
@@ -76,7 +75,6 @@ func run(store Store, send func(string) error) error {
 			return err
 		}
 	}
-
 	return nil
 }
 
@@ -86,11 +84,9 @@ func buildMessage(d *Deal) string {
 	if d.Price != 0 {
 		price = strconv.Itoa(d.Price)
 	}
-
 	vendor := "Unknown"
 	if d.Vendor != nil {
 		vendor = *d.Vendor
 	}
-
 	return fmt.Sprintf(message, d.Product, price, d.URL, vendor)
 }

@@ -41,7 +41,6 @@ func parseVendor(vendor string) *string {
 	if vendor == "-" {
 		return nil
 	}
-
 	return &vendor
 }
 
@@ -53,7 +52,6 @@ func parsePrice(price string) int {
 	if err != nil {
 		return 0
 	}
-
 	return p
 }
 
@@ -82,6 +80,5 @@ func fetchDeals() (*goquery.Document, error) {
 	if err != nil {
 		return nil, fmt.Errorf("parsing HTML failed: %v", err)
 	}
-
 	return doc, nil
 }
