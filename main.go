@@ -81,11 +81,16 @@ func run(store Store, send func(string) error) error {
 }
 
 func buildMessage(d *Deal) string {
-	message := "%s *%d kr* <%s|%s>"
+	message := "%s *%s kr* <%s|%s>"
+	price := "?"
+	if d.Price != 0 {
+		price = strconv.Itoa(d.Price)
+	}
+
 	vendor := "Unknown"
 	if d.Vendor != nil {
 		vendor = *d.Vendor
 	}
 
-	return fmt.Sprintf(message, d.Product, d.Price, d.URL, vendor)
+	return fmt.Sprintf(message, d.Product, price, d.URL, vendor)
 }
