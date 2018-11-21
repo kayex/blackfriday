@@ -6,10 +6,13 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 )
 
 const interval = time.Minute
+
+var notifier func(string) error
 
 func main() {
 	databaseUrl := os.Getenv("DATABASE_URL")
@@ -21,12 +24,13 @@ func main() {
 	}
 	store := &DBStore{db: db}
 	slack := NewSlack(&http.Client{}, slackWebhookUrl)
+	notifier = slack.send
 
 	ticker := time.NewTicker(interval)
 	for {
 		select {
 		case <-ticker.C:
-			err := run(store, slack)
+			err := run(store, notifier)
 			if err != nil {
 				log.Fatalln(err)
 			}
@@ -60,14 +64,14 @@ func findNewDeals(s Store) ([]Deal, error) {
 	return newDeals, nil
 }
 
-func run(store Store, slack *Slack) error {
+func run(store Store, send func(string) error) error {
 	newDeals, err := findNewDeals(store)
 	if err != nil {
 		return err
 	}
 
 	for _, d := range newDeals {
-		err := slack.send(buildMessage(&d))
+		err := send(buildMessage(&d))
 		if err != nil {
 			return err
 		}
