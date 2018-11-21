@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-const interval = 5 * time.Second
+const interval = time.Minute
 
 func main() {
 	databaseUrl := os.Getenv("DATABASE_URL")
@@ -17,15 +17,20 @@ func main() {
 
 	db, err := sql.Open("postgres", databaseUrl)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 	store := &DBStore{db: db}
 	slack := NewSlack(&http.Client{}, slackWebhookUrl)
 
-
-	err = run(store, slack)
-	if err != nil {
-		panic(err)
+	ticker := time.NewTicker(interval)
+	for {
+		select {
+		case <-ticker.C:
+			err := run(store, slack)
+			if err != nil {
+				log.Fatalln(err)
+			}
+		}
 	}
 }
 
