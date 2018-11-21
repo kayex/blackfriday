@@ -72,7 +72,6 @@ func run(store Store, slack *Slack) error {
 			return err
 		}
 	}
-	fmt.Println("Done.")
 
 	return nil
 }
