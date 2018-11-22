@@ -18,7 +18,7 @@ func TestDeal_Digest(t *testing.T) {
 				Score: 0,
 				URL: "https://example.com/store/rtx2080",
 			},
-			exp: "99914b932bd37a50b983c5e7c90ae93b",
+			exp: "9eaefbcfe6bb120205f74161ed51428c",
 		},
 		{
 			deal: &Deal{
@@ -28,7 +28,7 @@ func TestDeal_Digest(t *testing.T) {
 				Score: 10,
 				URL: "https://example.com/store/rtx2080",
 			},
-			exp: "99914b932bd37a50b983c5e7c90ae93b",
+			exp: "9eaefbcfe6bb120205f74161ed51428c",
 		},
 	}
 
