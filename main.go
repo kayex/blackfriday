@@ -25,6 +25,10 @@ func main() {
 	store := &DBStore{db: db}
 	slack := NewSlack(&http.Client{}, slackWebhookUrl)
 	notifier = slack.send
+	notifier = func(m string) error {
+		fmt.Println(m)
+		return nil
+	}
 
 	ticker := time.NewTicker(interval)
 	for {
@@ -78,7 +82,7 @@ func run(store DealStore, send func(string) error) error {
 }
 
 func buildNotification(d *Deal) string {
-	message := "%s *%s kr* <%s|%s>"
+	format := "%s *%s kr* <%s|%s>"
 	price := "?"
 	if d.Price != 0 {
 		price = strconv.Itoa(d.Price)
@@ -87,5 +91,5 @@ func buildNotification(d *Deal) string {
 	if d.Vendor != nil {
 		vendor = *d.Vendor
 	}
-	return fmt.Sprintf(message, d.Product, price, d.URL, vendor)
+	return fmt.Sprintf(format, d.Product, price, d.URL, vendor)
 }

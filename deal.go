@@ -17,7 +17,23 @@ type Deal struct {
 }
 
 func (d Deal) Digest() string {
-	jsonBytes, _ := json.Marshal(d)
+	comparable := struct{
+		product string
+		category string
+		vendor string
+		price int
+		url string
+	}{
+		product: d.Product,
+		category: d.Category,
+		price: d.Price,
+		url: d.URL,
+	}
+	if d.Vendor != nil {
+		comparable.vendor = *d.Vendor
+	}
+
+	jsonBytes, _ := json.Marshal(comparable)
 	return fmt.Sprintf("%x", md5.Sum(jsonBytes))
 }
 
