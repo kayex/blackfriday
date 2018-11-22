@@ -33,7 +33,6 @@ func main() {
 	ticker := time.NewTicker(interval)
 	for {
 		<-ticker.C
-		fmt.Println("tick")
 		err := run(store, notifier)
 		if err != nil {
 			log.Fatalln(err)

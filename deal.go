@@ -18,19 +18,19 @@ type Deal struct {
 
 func (d Deal) Digest() string {
 	comparable := struct{
-		product string
-		category string
-		vendor string
-		price int
-		url string
+		Product string
+		Category string
+		Vendor string
+		Price int
+		URL string
 	}{
-		product: d.Product,
-		category: d.Category,
-		price: d.Price,
-		url: d.URL,
+		Product: d.Product,
+		Category: d.Category,
+		Price: d.Price,
+		URL: d.URL,
 	}
 	if d.Vendor != nil {
-		comparable.vendor = *d.Vendor
+		comparable.Vendor = *d.Vendor
 	}
 
 	jsonBytes, _ := json.Marshal(comparable)
