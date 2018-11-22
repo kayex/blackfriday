@@ -8,12 +8,12 @@ import (
 )
 
 type Deal struct {
-	Product string
+	Product  string
 	Category string
-	Vendor *string
-	Price int
-	Score int
-	URL string
+	Vendor   *string
+	Price    int
+	Score    int
+	URL      string
 }
 
 func (d Deal) Digest() string {
@@ -38,4 +38,3 @@ func (d Deal) String() string {
 	}
 	return s
 }
-

@@ -23,12 +23,12 @@ func parseDeals(d *goquery.Document) ([]Deal, error) {
 		url, _ := s.Find(".productCell").Attr("href")
 
 		d := Deal{
-			Product: product,
+			Product:  product,
 			Category: category,
-			Vendor: vendor,
-			Price: price,
-			Score: score,
-			URL: url,
+			Vendor:   vendor,
+			Price:    price,
+			Score:    score,
+			URL:      url,
 		}
 
 		deals = append(deals, d)

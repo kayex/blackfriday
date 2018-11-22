@@ -66,7 +66,7 @@ func insertDeal(db *sql.DB, d *Deal) error {
 func values(items []string) string {
 	var parenthesized []string
 	for _, i := range items {
-		parenthesized = append(parenthesized, "('" + i + "')")
+		parenthesized = append(parenthesized, "('"+i+"')")
 	}
 
 	return strings.Join(parenthesized, ", ")

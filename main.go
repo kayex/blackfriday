@@ -42,7 +42,6 @@ func findAndStoreDeals(s DealStore) ([]Deal, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error fetching deals page: %v", err)
 	}
-
 	parsed, err := parseDeals(page)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing deals: %v", err)
@@ -59,6 +58,7 @@ func findAndStoreDeals(s DealStore) ([]Deal, error) {
 			return nil, fmt.Errorf("error saving new deal: %v", err)
 		}
 	}
+
 	return newDeals, nil
 }
 

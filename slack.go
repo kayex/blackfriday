@@ -8,13 +8,13 @@ import (
 )
 
 type Slack struct {
-	cl *http.Client
+	cl         *http.Client
 	webhookUrl string
 }
 
 func NewSlack(cl *http.Client, webhookUrl string) *Slack {
 	return &Slack{
-		cl: cl,
+		cl:         cl,
 		webhookUrl: webhookUrl,
 	}
 }
@@ -38,5 +38,3 @@ func (s *Slack) send(message string) error {
 
 	return nil
 }
-
-
