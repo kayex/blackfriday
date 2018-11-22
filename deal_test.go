@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -34,7 +33,6 @@ func TestDeal_Digest(t *testing.T) {
 
 	for _, c := range cases {
 		act := c.deal.Digest()
-		fmt.Printf("hash: %v\n", act)
 
 		if act != c.exp {
 			t.Errorf("Expected %#v.Digest() to return %q, %q given", c.deal, c.exp, act)

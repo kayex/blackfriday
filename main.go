@@ -25,10 +25,6 @@ func main() {
 	store := &DBStore{db: db}
 	slack := NewSlack(&http.Client{}, slackWebhookUrl)
 	notifier = slack.send
-	notifier = func(m string) error {
-		fmt.Println(m)
-		return nil
-	}
 
 	ticker := time.NewTicker(interval)
 	for {
