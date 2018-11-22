@@ -4,7 +4,6 @@ import (
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
-	_ "github.com/lib/pq"
 )
 
 type Deal struct {

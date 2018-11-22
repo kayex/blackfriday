@@ -8,6 +8,8 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	_ "github.com/lib/pq"
 )
 
 const interval = time.Minute
