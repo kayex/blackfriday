@@ -78,6 +78,13 @@ func TestNewDealNotification(t *testing.T) {
 			},
 			exp: "RTX 2080 <this-url-looks-funky|this-url-looks-funky>",
 		},
+		{
+			deal: &Deal{
+				Product: "RTX 2080",
+				URL: "https://www.example.com/store/rtx2080",
+			},
+			exp: "RTX 2080 <https://www.example.com/store/rtx2080|example.com>",
+		},
 	}
 
 	for _, c := range cases {

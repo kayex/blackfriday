@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/url"
 	"strconv"
+	"strings"
 )
 
 type Deal struct {
@@ -63,7 +64,7 @@ func NewDealNotification(d *Deal) string {
 	if d.Vendor != nil {
 		vendor = *d.Vendor
 	} else if u, err := url.Parse(d.URL); err == nil && u.Hostname() != "" {
-		vendor = u.Hostname()
+		vendor = strings.TrimPrefix(u.Hostname(), "www.")
 	}
 
 	notification += fmt.Sprintf(" <%s|%s>", d.URL, vendor)
