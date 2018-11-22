@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 	"time"
@@ -84,9 +85,19 @@ func buildNotification(d *Deal) string {
 	if d.Price != 0 {
 		price = strconv.Itoa(d.Price)
 	}
-	vendor := "Unknown"
+	vendor := getDomain(d.URL)
 	if d.Vendor != nil {
 		vendor = *d.Vendor
 	}
+
 	return fmt.Sprintf(format, d.Product, price, d.URL, vendor)
+}
+
+func getDomain(s string) string {
+	u, err := url.Parse(s)
+	if err != nil {
+		return s
+	}
+
+	return u.Hostname()
 }
