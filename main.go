@@ -13,7 +13,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const interval = time.Minute
+const interval = time.Second
 
 var notifier func(string) error
 
@@ -28,6 +28,10 @@ func main() {
 	store := &DBStore{db: db}
 	slack := NewSlack(&http.Client{}, slackWebhookUrl)
 	notifier = slack.send
+	notifier = func(m string) error {
+		fmt.Println(m)
+		return nil
+	}
 
 	if os.Getenv("REDIGEST") == "true" {
 		err := redigest(store)
@@ -107,17 +111,20 @@ func loop(store DealStore, send func(string) error) {
 }
 
 func buildNotification(d *Deal) string {
-	format := "%s *%s kr* <%s|%s>"
-	price := "?"
+	notification := d.Product
+
 	if d.Price != 0 {
-		price = strconv.Itoa(d.Price)
+		price := fmt.Sprintf(" *%s kr*", strconv.Itoa(d.Price))
+		notification += price
 	}
+
 	vendor := getDomain(d.URL)
 	if d.Vendor != nil {
 		vendor = *d.Vendor
 	}
+	notification += fmt.Sprintf(" <%s|%s>", d.URL, vendor)
 
-	return fmt.Sprintf(format, d.Product, price, d.URL, vendor)
+	return notification
 }
 
 func getDomain(s string) string {
