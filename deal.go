@@ -7,6 +7,7 @@ import (
 )
 
 type Deal struct {
+	ID *int
 	Product  string
 	Category string
 	Vendor   *string
@@ -17,19 +18,11 @@ type Deal struct {
 
 func (d Deal) Digest() string {
 	comparable := struct{
-		Product string
-		Category string
-		Vendor string
 		Price int
 		URL string
 	}{
-		Product: d.Product,
-		Category: d.Category,
 		Price: d.Price,
 		URL: d.URL,
-	}
-	if d.Vendor != nil {
-		comparable.Vendor = *d.Vendor
 	}
 
 	jsonBytes, _ := json.Marshal(comparable)
@@ -38,6 +31,8 @@ func (d Deal) Digest() string {
 
 type DealStore interface {
 	Add(*Deal) error
+	Redigest(*Deal) error
+	All() ([]Deal, error)
 	FilterNew([]Deal) ([]Deal, error)
 }
 

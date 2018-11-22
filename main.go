@@ -29,14 +29,30 @@ func main() {
 	slack := NewSlack(&http.Client{}, slackWebhookUrl)
 	notifier = slack.send
 
-	ticker := time.NewTicker(interval)
-	for {
-		<-ticker.C
-		err := run(store, notifier)
+	if os.Getenv("REDIGEST") == "true" {
+		err := redigest(store)
 		if err != nil {
 			log.Fatalln(err)
 		}
 	}
+
+	loop(store, notifier)
+}
+
+func redigest(store DealStore) error {
+	deals, err := store.All()
+	if err != nil {
+		return fmt.Errorf("error getting deals for redigestion: %v", err)
+	}
+
+	for _, d := range deals {
+		err := store.Redigest(&d)
+		if err != nil {
+			return fmt.Errorf("error during redigestion: %v", err)
+		}
+	}
+
+	return nil
 }
 
 func findAndStoreDeals(s DealStore) ([]Deal, error) {
@@ -77,6 +93,17 @@ func run(store DealStore, send func(string) error) error {
 		}
 	}
 	return nil
+}
+
+func loop(store DealStore, send func(string) error) {
+	ticker := time.NewTicker(interval)
+	for {
+		<-ticker.C
+		err := run(store, notifier)
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}
 }
 
 func buildNotification(d *Deal) string {

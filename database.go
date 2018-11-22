@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"strings"
 )
@@ -12,6 +13,39 @@ type DBStore struct {
 
 func (s *DBStore) Add(d *Deal) error {
 	return insertDeal(s.db, d)
+}
+
+func (s *DBStore) Redigest(d *Deal) error {
+	if d.ID == nil {
+		return errors.New("cannot redigest deal with no ID")
+	}
+
+	query := `UPDATE deals SET digest = $2 WHERE id = $1`
+	_, err := s.db.Exec(query, *d.ID, d.Digest())
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *DBStore) All() ([]Deal, error) {
+	query := `SELECT id, product, category, vendor, price, score, url FROM deals`
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+
+	var deals []Deal
+	for rows.Next() {
+		var d Deal
+		err := rows.Scan(&d.ID, &d.Product, &d.Category, &d.Vendor, &d.Price, &d.Score, &d.URL)
+		if err != nil {
+			return nil, err
+		}
+		deals = append(deals, d)
+	}
+
+	return deals, nil
 }
 
 func (s *DBStore) FilterNew(deals []Deal) ([]Deal, error) {
