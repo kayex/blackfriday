@@ -4,6 +4,8 @@ import (
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
+	"net/url"
+	"strconv"
 )
 
 type Deal struct {
@@ -47,4 +49,24 @@ func (d Deal) String() string {
 		s += fmt.Sprintf(" [+%d]", d.Score)
 	}
 	return s
+}
+
+func NewDealNotification(d *Deal) string {
+	notification := d.Product
+
+	if d.Price != 0 {
+		price := fmt.Sprintf(" *%s kr*", strconv.Itoa(d.Price))
+		notification += price
+	}
+
+	vendor := d.URL
+	if d.Vendor != nil {
+		vendor = *d.Vendor
+	} else if u, err := url.Parse(d.URL); err == nil && u.Hostname() != "" {
+		vendor = u.Hostname()
+	}
+
+	notification += fmt.Sprintf(" <%s|%s>", d.URL, vendor)
+
+	return notification
 }

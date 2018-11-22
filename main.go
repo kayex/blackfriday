@@ -5,9 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
-	"strconv"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -92,7 +90,7 @@ func run(store DealStore, send func(string) error) error {
 	}
 
 	for _, d := range newDeals {
-		err := send(buildNotification(&d))
+		err := send(NewDealNotification(&d))
 		if err != nil {
 			return err
 		}
@@ -109,24 +107,4 @@ func loop(store DealStore, send func(string) error) {
 			log.Fatalln(err)
 		}
 	}
-}
-
-func buildNotification(d *Deal) string {
-	notification := d.Product
-
-	if d.Price != 0 {
-		price := fmt.Sprintf(" *%s kr*", strconv.Itoa(d.Price))
-		notification += price
-	}
-
-	vendor := d.URL
-	if d.Vendor != nil {
-		vendor = *d.Vendor
-	} else if u, err := url.Parse(d.URL); err != nil {
-		vendor = u.Hostname()
-	}
-
-	notification += fmt.Sprintf(" <%s|%s>", d.URL, vendor)
-
-	return notification
 }
