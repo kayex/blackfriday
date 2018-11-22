@@ -28,17 +28,16 @@ func main() {
 
 	ticker := time.NewTicker(interval)
 	for {
-		select {
-		case <-ticker.C:
-			err := run(store, notifier)
-			if err != nil {
-				log.Fatalln(err)
-			}
+		<-ticker.C
+		fmt.Println("tick")
+		err := run(store, notifier)
+		if err != nil {
+			log.Fatalln(err)
 		}
 	}
 }
 
-func findAndStoreDeals(s Store) ([]Deal, error) {
+func findAndStoreDeals(s DealStore) ([]Deal, error) {
 	page, err := fetchDeals()
 	if err != nil {
 		return nil, fmt.Errorf("error fetching deals page: %v", err)
@@ -46,7 +45,7 @@ func findAndStoreDeals(s Store) ([]Deal, error) {
 
 	parsed, err := parseDeals(page)
 	if err != nil {
-		return nil, fmt.Errorf("error fetching deals from page: %v", err)
+		return nil, fmt.Errorf("error parsing deals: %v", err)
 	}
 
 	newDeals, err := s.FilterNew(parsed)
@@ -63,14 +62,14 @@ func findAndStoreDeals(s Store) ([]Deal, error) {
 	return newDeals, nil
 }
 
-func run(store Store, send func(string) error) error {
+func run(store DealStore, send func(string) error) error {
 	newDeals, err := findAndStoreDeals(store)
 	if err != nil {
 		return err
 	}
 
 	for _, d := range newDeals {
-		err := send(buildMessage(&d))
+		err := send(buildNotification(&d))
 		if err != nil {
 			return err
 		}
@@ -78,7 +77,7 @@ func run(store Store, send func(string) error) error {
 	return nil
 }
 
-func buildMessage(d *Deal) string {
+func buildNotification(d *Deal) string {
 	message := "%s *%s kr* <%s|%s>"
 	price := "?"
 	if d.Price != 0 {

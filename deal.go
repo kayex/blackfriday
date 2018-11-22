@@ -21,7 +21,7 @@ func (d Deal) Digest() string {
 	return fmt.Sprintf("%x", md5.Sum(jsonBytes))
 }
 
-type Store interface {
+type DealStore interface {
 	Add(*Deal) error
 	FilterNew([]Deal) ([]Deal, error)
 }

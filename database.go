@@ -11,7 +11,7 @@ type DBStore struct {
 }
 
 func (s *DBStore) Add(d *Deal) error {
-	return insert(s.db, d)
+	return insertDeal(s.db, d)
 }
 
 func (s *DBStore) FilterNew(deals []Deal) ([]Deal, error) {
@@ -54,11 +54,11 @@ func (s *DBStore) filterNewDigests(digests []string) ([]string, error) {
 	return newDigests, nil
 }
 
-func insert(db *sql.DB, d *Deal) error {
+func insertDeal(db *sql.DB, d *Deal) error {
 	query := "INSERT INTO deals (product, category, vendor, price, score, url, digest) VALUES ($1, $2, $3, $4, $5, $6, $7)"
 	_, err := db.Exec(query, d.Product, d.Category, d.Vendor, d.Price, d.Score, d.URL, d.Digest())
 	if err != nil {
-		return fmt.Errorf("SQL insert error: %v", err)
+		return fmt.Errorf("SQL insertDeal error: %v", err)
 	}
 	return nil
 }
