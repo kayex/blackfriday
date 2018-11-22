@@ -13,24 +13,25 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const interval = time.Second
+const interval = time.Minute
 
 var notifier func(string) error
 
 func main() {
-	databaseUrl := os.Getenv("DATABASE_URL")
-	slackWebhookUrl := os.Getenv("SLACK_WEBHOOK_URL")
-
-	db, err := sql.Open("postgres", databaseUrl)
+	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
 	if err != nil {
 		log.Fatalln(err)
 	}
 	store := &DBStore{db: db}
-	slack := NewSlack(&http.Client{}, slackWebhookUrl)
-	notifier = slack.send
-	notifier = func(m string) error {
-		fmt.Println(m)
-		return nil
+
+	if os.Getenv("NOTIFIER") == "STDOUT" {
+		notifier = func(m string) error {
+			fmt.Println(m)
+			return nil
+		}
+	} else {
+		slack := NewSlack(&http.Client{}, os.Getenv("SLACK_WEBHOOK_URL"))
+		notifier = slack.send
 	}
 
 	if os.Getenv("REDIGEST") == "true" {
@@ -103,7 +104,7 @@ func loop(store DealStore, send func(string) error) {
 	ticker := time.NewTicker(interval)
 	for {
 		<-ticker.C
-		err := run(store, notifier)
+		err := run(store, send)
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -118,20 +119,14 @@ func buildNotification(d *Deal) string {
 		notification += price
 	}
 
-	vendor := getDomain(d.URL)
+	vendor := d.URL
 	if d.Vendor != nil {
 		vendor = *d.Vendor
+	} else if u, err := url.Parse(d.URL); err != nil {
+		vendor = u.Hostname()
 	}
+
 	notification += fmt.Sprintf(" <%s|%s>", d.URL, vendor)
 
 	return notification
-}
-
-func getDomain(s string) string {
-	u, err := url.Parse(s)
-	if err != nil {
-		return s
-	}
-
-	return u.Hostname()
 }
